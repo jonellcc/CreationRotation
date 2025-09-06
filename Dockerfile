@@ -1,23 +1,21 @@
-# Use lightweight Node.js image
 FROM node:20-alpine AS base
 
 # Set working directory
 WORKDIR /server
 
-# Copy package files first (for caching)
-COPY package*.json ./
+# Copy package files from /server
+COPY server/package*.json ./
 
-# Install dependencies (prod only)
-RUN npm install --omit=dev
+# Install all dependencies (needed to run tsc)
+RUN npm install
 
-# Copy the entire project
-COPY . .
+# Copy the rest of the project
+COPY server/ ./
 
 # Build TypeScript
 RUN npm run build
 
-# Expose port (Express default 3000, change if needed)
-EXPOSE 3000
+# Expose app port (change if your server uses a different one)
 
-# Start the server
+# Run compiled code
 CMD ["node", "out/main.js"]
